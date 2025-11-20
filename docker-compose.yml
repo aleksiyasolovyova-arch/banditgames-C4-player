@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mcts-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcts-ai
+    networks:
+      - connect4-network
+    volumes:
+      # Share MCTS code with other containers via volume
+      - mcts-code:/app:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+networks:
+  connect4-network:
+    external: true
+
+volumes:
+  mcts-code:
+    name: mcts-shared-code
