@@ -3,7 +3,7 @@ stages:
 
 push:
   stage: push
-  image: docker:stable
+  image: docker:latest
   services:
     - name: docker:dind
       alias: docker
