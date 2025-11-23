@@ -16,7 +16,7 @@ push:
     IMAGE_NAME: $DOCKER_HUB_IMAGE_REGISTRY/$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO_NAME
     IMAGE_TAG: $CI_COMMIT_REF_SLUG
   tags:
-    - gitlab-org-medium
+    - gitlab-org-docker
   before_script:
     - |
       echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
