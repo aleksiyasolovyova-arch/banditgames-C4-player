@@ -1,0 +1,29 @@
+stages:
+  - push
+
+push:
+  stage: push
+  image: docker:stable
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_HUB_USERNAME: $DOCKER_HUB_USERNAME
+    DOCKER_HUB_ACCESS_TOKEN: $DOCKER_HUB_ACCESS_TOKEN
+    DOCKER_HUB_REPO_NAME: $DOCKER_HUB_REPO_AI_CONNECT4_PLAYER
+    DOCKER_HUB_IMAGE_REGISTRY: $DOCKER_HUB_IMAGE_REGISTRY
+    IMAGE_NAME: $DOCKER_HUB_IMAGE_REGISTRY/$DOCKER_HUB_USERNAME/$DOCKER_HUB_REPO_NAME
+    IMAGE_TAG: $CI_COMMIT_REF_SLUG
+  tags:
+    - docker
+  before_script:
+    - |
+      echo "$DOCKER_HUB_ACCESS_TOKEN" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+
+  script:
+    - |
+      docker build -t $IMAGE_NAME:$IMAGE_TAG .
+      docker push $IMAGE_NAME:$IMAGE_TAG
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
