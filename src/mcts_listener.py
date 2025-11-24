@@ -297,8 +297,19 @@ class MCTSListener:
 
 
 if __name__ == "__main__":
-    # Wait for RabbitMQ and Connect4 Backend to be ready
-    time.sleep(10)
-
-    listener = MCTSListener()
-    listener.start()
+    # Wait for RabbitMQ to be ready
+    import time
+    max_retries = 10
+    retry_delay = 5
+    for i in range(max_retries):
+        try:
+            listener = MCTSListener()
+            listener.start()
+            break
+        except pika.exceptions.AMQPConnectionError:
+            if i < max_retries - 1:
+                print(f"RabbitMQ not ready, retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print("Failed to connect to RabbitMQ after multiple retries")
+                raise
