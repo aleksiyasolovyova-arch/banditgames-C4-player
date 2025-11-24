@@ -31,13 +31,14 @@ class MCTSListener:
     def setup_rabbitmq(self):
         """Setup RabbitMQ consumer"""
         try:
-            # Connect to RabbitMQ
+            credentials = pika.PlainCredentials('user', 'password')
             params = pika.ConnectionParameters(
                 host=self.rabbitmq_host,
                 port=5672,
-                heartbeat=600,
+                credentials=credentials,
+                heartbeat=30,
                 blocked_connection_timeout=300
-            )
+            )            
             self.connection = pika.BlockingConnection(params)
             self.channel = self.connection.channel()
 
