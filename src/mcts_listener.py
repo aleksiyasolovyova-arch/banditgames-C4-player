@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class MCTSListener:
     """Enhanced MCTS service with in-game adaptation"""
 
-    def __init__(self, rabbitmq_host='rabbitmq', api_base_url='http://connect4-api:8000'):
+    def __init__(self, rabbitmq_host='rabbitmq', api_base_url='http://localhost:8000'):
         self.rabbitmq_host = rabbitmq_host
         self.api_base_url = api_base_url
         self.ai_manager = AIManager()
