@@ -4,9 +4,14 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies if needed
+# ---------------------------------------
+# Install system dependencies
+#    - gcc/build-essential: for compiling pip packages
+#    - libpq-dev: for psycopg2 (PostgreSQL driver)
+# ---------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
@@ -22,8 +27,12 @@ COPY src/ai_manager.py .
 # Copy the listener script
 COPY src/mcts_listener.py .
 
-# Create logs directory
-RUN mkdir -p /app/logs
+# Copy dataset generation files
+COPY src/dataset_exporter.py .
+COPY src/self_play_runner.py .
+
+# Create logs and data directories
+RUN mkdir -p /app/logs /app/data/datasets
 
 # Create non-root user for security
 RUN useradd -ms /bin/bash mcts_user && \
