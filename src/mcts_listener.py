@@ -101,6 +101,7 @@ class MCTSListener:
             bindings = [
                 ('connect4_events', 'ai.move.needed'),
                 ('connect4_events', 'human.move.made'),
+                ('connect4_events', 'game.move.made'),  # For oracle analysis
                 ('connect4_events', 'game.created'),
                 ('connect4_events', 'game.ended'),
                 ('connect4_events', 'game.ai_vs_ai.created'),
@@ -222,6 +223,8 @@ class MCTSListener:
                 game_id=game_id,
                 move_index=move_index,
                 state_hash=state.compute_hash(),
+                board_state=board,
+                current_player=current_player,
                 result=result,
                 actual_move=actual_move
             )
@@ -234,6 +237,8 @@ class MCTSListener:
             game_id: str,
             move_index: int,
             state_hash: str,
+            board_state: list,
+            current_player: int,
             result: OracleResult,
             actual_move: int = None
     ):
@@ -241,10 +246,15 @@ class MCTSListener:
         try:
             url = f"{self.api_base_url}/oracle/log"
 
+            # Convert current_player int to string format
+            current_player_str = f"player{current_player}"
+
             payload = {
                 "game_id": game_id,
                 "move_index": move_index,
                 "state_hash": state_hash,
+                "board_state": board_state,
+                "current_player": current_player_str,
                 "best_move": result.best_move,
                 "move_ranking": result.move_ranking,
                 "visit_counts": result.visit_counts,
@@ -510,13 +520,28 @@ class MCTSListener:
                 game_id = event['game_id']
                 self.ai_manager.record_human_move_time(game_id)
 
+            elif event_type == 'game.move.made':
+                # Run oracle analysis for EVERY move (human or AI)
+                if self.enable_oracle:
+                    game_id = event['game_id']
+                    board_before = event.get('board_before')
+                    move_index = event.get('turn_index', 0)
+                    actual_move = event.get('column')
+                    current_player = event.get('current_player', 1)
+
+                    if board_before is not None:
+                        Thread(
+                            target=self.run_oracle_analysis,
+                            args=(game_id, board_before, current_player, move_index, actual_move),
+                            daemon=True
+                        ).start()
+
             elif event_type == 'ai.move.needed':
                 game_id = event['game_id']
                 board = event['board']
                 current_player = event['current_player']
                 skill_level = event.get('skill_level')
                 dda_adjustment = event.get('dda_adjustment', 1.0)
-                move_index = event.get('move_index', 0)
 
                 Thread(
                     target=self.calculate_ai_move,
@@ -524,12 +549,7 @@ class MCTSListener:
                     daemon=True
                 ).start()
 
-                if self.enable_oracle:
-                    Thread(
-                        target=self.run_oracle_analysis,
-                        args=(game_id, board, current_player, move_index),
-                        daemon=True
-                    ).start()
+                # Oracle analysis now runs via game.move.made event (after the move is made)
 
             elif event_type == 'game.created':
                 game_id = event['game_id']
