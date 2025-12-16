@@ -9,12 +9,12 @@ import threading
 import logging
 from typing import Dict, Optional, Tuple, List, Any
 from collections import deque
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass, asdict
 
-from mcts import MCTS, MoveStatistics
+from src.mcts.mcts import MCTS
 from ConnectState import ConnectState
-from meta import MCTSMeta, SelfPlayMeta
+from src.config.meta import MCTSMeta
 
 logger = logging.getLogger(__name__)
 

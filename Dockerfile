@@ -19,17 +19,17 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy MCTS source files from src directory
-COPY src/mcts.py .
+COPY src/mcts/mcts.py .
 COPY src/ConnectState.py .
-COPY src/meta.py .
-COPY src/ai_manager.py .
+COPY src/config/meta.py .
+COPY src/core/ai_manager.py .
 
 # Copy the listener script
-COPY src/mcts_listener.py .
+COPY src/in/mcts_listener.py .
 
 # Copy dataset generation files
 COPY src/dataset_exporter.py .
-COPY src/self_play_runner.py .
+COPY src/core/self_play_runner.py .
 
 # Create logs and data directories
 RUN mkdir -p /app/logs /app/data/datasets

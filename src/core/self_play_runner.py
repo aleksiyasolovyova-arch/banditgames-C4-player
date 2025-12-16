@@ -4,22 +4,20 @@ Runs games between AI agents and logs comprehensive data for ML training.
 """
 
 import os
-import sys
 import json
 import logging
 import uuid
 import time
 import random
 from datetime import datetime
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass, asdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import requests
 
 from ConnectState import ConnectState
-from ai_manager import AIManager, AIAgent, MCTSResult
-from meta import MCTSMeta, SelfPlayMeta
+from src.core.ai_manager import AIManager, AIAgent
 
 logging.basicConfig(
     level=logging.INFO,
