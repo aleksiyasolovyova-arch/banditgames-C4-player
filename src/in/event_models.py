@@ -1,0 +1,1 @@
+# Pydantic models for incoming Connect4 events

@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 
 from ConnectState import ConnectState
-from src.core.ai_manager import AIManager, AIAgent
+from src.ai_manager import AIManager, AIAgent
 
 logging.basicConfig(
     level=logging.INFO,

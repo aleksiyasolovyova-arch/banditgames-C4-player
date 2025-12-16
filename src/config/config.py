@@ -1,0 +1,1 @@
+# Settings: RabbitMQ, Connect4 URL, AI_PLAYER_ID, etc.

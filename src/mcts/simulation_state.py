@@ -1,0 +1,1 @@
+# converts Connect4 preState into internal state (your ConnectState)
