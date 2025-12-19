@@ -1,4 +1,4 @@
-# Dockerfile for MCTS Repository (Service with RabbitMQ)
+# Dockerfile for AI Connect4 Player Service
 FROM python:3.11-slim
 
 # Set working directory
@@ -18,34 +18,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy MCTS source files from src directory
-COPY src/mcts.py .
-COPY src/ConnectState.py .
-COPY src/meta.py .
-COPY src/ai_manager.py .
+# Copy entire source directory (preserves modular structure)
+COPY src/ ./src/
 
-# Copy the listener script
-COPY src/mcts_listener.py .
-
-# Copy dataset generation files
-COPY src/dataset_exporter.py .
-COPY src/self_play_runner.py .
-
-# Create logs and data directories
-RUN mkdir -p /app/logs /app/data/datasets
 
 # Create non-root user for security
-RUN useradd -ms /bin/bash mcts_user && \
-    chown -R mcts_user:mcts_user /app
-USER mcts_user
+RUN useradd -ms /bin/bash aiuser && \
+    chown -R aiuser:aiuser /app
+USER aiuser
 
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
-# Health check to ensure service is responsive
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
-    CMD python -c "import mcts; import pika; print('OK')" || exit 1
+# Expose port
+EXPOSE 8002
 
-# Run the MCTS listener service
-CMD ["python", "mcts_listener.py"]
+# Health check to ensure service is responsive
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python -c "import httpx; httpx.get('http://localhost:8002/health', timeout=5).raise_for_status()" || exit 1
+
+# Run the FastAPI application
+CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8002"]
