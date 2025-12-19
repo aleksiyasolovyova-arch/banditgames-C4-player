@@ -13,3 +13,20 @@ psycopg2-binary>=2.9.0
 # Dataset export
 pandas>=2.0.0
 pyarrow>=14.0.0
+
+# Core Dependencies
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# HTTP Client
+httpx==0.28.1
+
+# NumPy for MCTS
+numpy==1.26.4
+
+# Utilities
+python-dotenv==1.0.1
+
+tenacity==9.0.0

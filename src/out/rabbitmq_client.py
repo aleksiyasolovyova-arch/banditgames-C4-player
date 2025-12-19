@@ -1,1 +1,0 @@
-# shared RabbitMQ connection wrapper

@@ -1,1 +1,0 @@
-# publish AI telemetry event for logging service 

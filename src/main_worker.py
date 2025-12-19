@@ -1,1 +1,0 @@
-# entrypoint for AI worker
