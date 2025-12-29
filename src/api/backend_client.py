@@ -57,7 +57,12 @@ class Connect4BackendClient:
         # Create async HTTP client
         self.client = httpx.AsyncClient(
             base_url=self.base_url,
-            timeout=self.timeout
+            timeout=self.timeout,
+            limits=httpx.Limits(
+                max_keepalive_connections=100,  # Keep 100 connections alive
+                max_connections=200,  # Allow up to 200 total
+                keepalive_expiry=30.0  # Keep connections for 30s
+            )
         )
         
         logger.info(f"Connect4BackendClient initialized: {self.base_url}")

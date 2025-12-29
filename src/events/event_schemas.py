@@ -56,6 +56,7 @@ class MoveEvent(BaseModel):
     eventType: str  # "move.made"
     timestamp: str
     gameId: str
+    nextPlayerId: str
     move: MoveInfo
     legalMoves: List[int]  # Legal moves BEFORE this move was made
     preState: GameStateInfo  # State before move
