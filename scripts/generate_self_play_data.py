@@ -79,7 +79,6 @@ class SelfPlayOrchestrator:
                 f"  {skill:8s}: {prob*100:5.1f}% "
                 f"(time={config.time_limit}s, rollouts≤{config.rollout_limit})"
             )
-        logger.info(f"{'='*70}\n")
 
     def _validate_skill_distribution(self) -> None:
         """Validate that skill distribution uses valid skill levels"""
@@ -156,13 +155,12 @@ class SelfPlayOrchestrator:
         """
         Create a game via Connect4 Backend
 
-        FIXED: Now includes gameId in the request body
         """
         try:
             response = await self.backend_client.post(
                 "/games",
                 json={
-                    "gameId": game_id,  # ✅ FIXED: Added missing gameId field
+                    "gameId": game_id,
                     "playerOne": {
                         "id": player_one_id,
                         "name": player_one_name
@@ -276,7 +274,7 @@ class SelfPlayOrchestrator:
             Dictionary with game_id and metadata
         """
         # Generate unique IDs
-        game_id = str(uuid.uuid4())  # ✅ FIXED: Generate game_id here
+        game_id = str(uuid.uuid4())
         ai_1_id = str(uuid.uuid4())
         ai_2_id = str(uuid.uuid4())
 
@@ -295,7 +293,7 @@ class SelfPlayOrchestrator:
 
         # Step 2: Create game via Backend (with game_id)
         returned_game_id = await self.create_game(
-            game_id=game_id,  # ✅ FIXED: Pass game_id to create_game
+            game_id=game_id,
             player_one_id=ai_1_id,
             player_one_name=f"AI-{skill_1}",
             player_two_id=ai_2_id,
@@ -432,7 +430,6 @@ class SelfPlayOrchestrator:
                 f"[time={config.time_limit}s, rollouts≤{config.rollout_limit}]"
             )
 
-        logger.info(f"{'='*70}\n")
 
     async def close(self):
         """Close HTTP clients"""
@@ -555,13 +552,12 @@ Examples:
         # Print summary
         completed = sum(1 for g in games if g.get('status') == 'completed')
         logger.info(f"SUMMARY")
-        logger.info(f"{'='*70}")
         logger.info(f"Games requested: {args.num_games}")
         logger.info(f"Games completed: {completed}")
         logger.info(f"Success rate: {(completed/args.num_games)*100:.1f}%")
         logger.info(f"\n All games completed!")
-        logger.info(f"📊 All move.logged events published to Gameplay Logging Service")
-        logger.info(f"🔍 Check logger service stats: curl http://localhost:8010/stats")
+        logger.info(f" All move.logged events published to Gameplay Logging Service")
+        logger.info(f" Check logger service stats: curl http://localhost:8010/stats")
 
     finally:
         await orchestrator.close()
