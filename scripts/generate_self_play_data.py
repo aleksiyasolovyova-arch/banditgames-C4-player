@@ -147,16 +147,22 @@ class SelfPlayOrchestrator:
 
     async def create_game(
         self,
+        game_id: str,
         player_one_id: str,
         player_one_name: str,
         player_two_id: str,
         player_two_name: str
     ) -> str:
-        """Create a game via Connect4 Backend"""
+        """
+        Create a game via Connect4 Backend
+
+        FIXED: Now includes gameId in the request body
+        """
         try:
             response = await self.backend_client.post(
                 "/games",
                 json={
+                    "gameId": game_id,  # ✅ FIXED: Added missing gameId field
                     "playerOne": {
                         "id": player_one_id,
                         "name": player_one_name
@@ -269,7 +275,8 @@ class SelfPlayOrchestrator:
         Returns:
             Dictionary with game_id and metadata
         """
-        # Generate unique player IDs
+        # Generate unique IDs
+        game_id = str(uuid.uuid4())  # ✅ FIXED: Generate game_id here
         ai_1_id = str(uuid.uuid4())
         ai_2_id = str(uuid.uuid4())
 
@@ -286,15 +293,16 @@ class SelfPlayOrchestrator:
         await self.register_ai_player(ai_1_id, skill_1)
         await self.register_ai_player(ai_2_id, skill_2)
 
-        # Step 2: Create game via Backend
-        game_id = await self.create_game(
+        # Step 2: Create game via Backend (with game_id)
+        returned_game_id = await self.create_game(
+            game_id=game_id,  # ✅ FIXED: Pass game_id to create_game
             player_one_id=ai_1_id,
             player_one_name=f"AI-{skill_1}",
             player_two_id=ai_2_id,
             player_two_name=f"AI-{skill_2}"
         )
 
-        logger.info(f"[Game {game_number:4d}] Created game {game_id[:8]}")
+        logger.info(f"[Game {game_number:4d}] Created game {returned_game_id[:8]}")
 
         # Step 3: Make first move to start the game
         first_column = random.randint(0, 6)
@@ -304,7 +312,7 @@ class SelfPlayOrchestrator:
             f"[Game {game_number:4d}] Started with first move: col={first_column}"
         )
 
-        # Step 4: WAIT FOR GAME TO COMPLETE (NEW!)
+        # Step 4: WAIT FOR GAME TO COMPLETE
         completion_result = await self.wait_for_game_completion(
             game_id, game_number
         )
@@ -552,8 +560,8 @@ Examples:
         logger.info(f"Games completed: {completed}")
         logger.info(f"Success rate: {(completed/args.num_games)*100:.1f}%")
         logger.info(f"\n All games completed!")
-        logger.info(f" All move.logged events published to Gameplay Logging Service")
-        logger.info(f" Check logger service stats: curl http://localhost:8010/stats")
+        logger.info(f"📊 All move.logged events published to Gameplay Logging Service")
+        logger.info(f"🔍 Check logger service stats: curl http://localhost:8010/stats")
 
     finally:
         await orchestrator.close()
